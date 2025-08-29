@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Görüntülü Arama</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 flex flex-col items-center justify-center min-h-screen text-white">
+
+  <h1 class="text-3xl font-extrabold mb-6 drop-shadow-lg">🚀 Süper Şahane Arama</h1>
+
+  <!-- Video Alanları -->
+  <div class="flex gap-6 mb-6">
+    <video id="localVideo" autoplay playsinline muted 
+      class="w-64 h-44 rounded-2xl shadow-2xl ring-4 ring-white/30 bg-transparent"></video>
+    <video id="remoteVideo" autoplay playsinline 
+      class="w-64 h-44 rounded-2xl shadow-2xl ring-4 ring-white/30 bg-transparent"></video>
+  </div>
+
+  <!-- Kontrol Paneli -->
+  <div class="bg-white/20 backdrop-blur-lg p-6 rounded-2xl shadow-2xl flex flex-col gap-4 w-full max-w-md">
+    <button id="createBtn" class="bg-blue-500 hover:bg-blue-600 p-3 rounded-xl font-semibold shadow-md transition">📞 Arama Başlat</button>
+    
+    <input id="callIdInput" placeholder="Call ID gir" 
+      class="p-3 rounded-xl text-black focus:ring-2 focus:ring-purple-400 shadow-inner">
+    
+    <button id="answerBtn" class="bg-green-500 hover:bg-green-600 p-3 rounded-xl font-semibold shadow-md transition">✅ Aramaya Katıl</button>
+
+    <button id="hangupBtn" class="bg-red-500 hover:bg-red-600 p-3 rounded-xl font-semibold shadow-md transition">❌ Aramayı Bitir</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, onSnapshot } 
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // 🔑 Firebase ayarlarını buraya yapıştır
+    const firebaseConfig = {
+      apiKey: "SENİN_API_KEY",
+      authDomain: "SENIN_PROJE.firebaseapp.com",
+      projectId: "SENIN_PROJE_ID",
+      storageBucket: "SENIN_PROJE.appspot.com",
+      messagingSenderId: "NUMARA",
+      appId: "APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Video elementleri
+    const localVideo = document.getElementById("localVideo");
+    const remoteVideo = document.getElementById("remoteVideo");
+
+    const servers = { iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }] };
+    const pc = new RTCPeerConnection(servers);
+
+    // Local stream
+    const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+    localVideo.srcObject = localStream;
+
+    const remoteStream = new MediaStream();
+    pc.ontrack = event => {
+      event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+    };
+    remoteVideo.srcObject = remoteStream;
+
+    let callId = null;
+    let isCaller = false;
+
+    // ICE Candidate Firestore'a yaz
+    pc.onicecandidate = async event => {
+      if (event.candidate && callId) {
+        const ref = doc(db, "calls", callId);
+        const col = isCaller ? "offerCandidates" : "answerCandidates";
+        await addDoc(collection(ref, col), event.candidate.toJSON());
+      }
+    };
+
+    // 🔵 Arama Başlat
+    document.getElementById("createBtn").onclick = async () => {
+      isCaller = true;
+      const callRef = doc(collection(db, "calls"));
+      callId = callRef.id;
+      alert("Call ID: " + callId);
+
+      const offerDescription = await pc.createOffer();
+      await pc.setLocalDescription(offerDescription);
+
+      const offer = { sdp: offerDescription.sdp, type: offerDescription.type };
+      await setDoc(callRef, { offer });
+
+      // Answer dinle
+      onSnapshot(callRef, async snapshot => {
+        const data = snapshot.data();
+        if (data?.answer && !pc.currentRemoteDescription) {
+          const answerDesc = new RTCSessionDescription(data.answer);
+          await pc.setRemoteDescription(answerDesc);
+        }
+      });
+
+      // Answer ICE dinle
+      onSnapshot(collection(callRef, "answerCandidates"), snapshot => {
+        snapshot.docChanges().forEach(change => {
+          if (change.type === "added") {
+            const candidate = new RTCIceCandidate(change.doc.data());
+            pc.addIceCandidate(candidate);
+          }
+        });
+      });
+    };
+
+    // 🟢 Aramaya Katıl
+    document.getElementById("answerBtn").onclick = async () => {
+      const inputId = document.getElementById("callIdInput").value;
+      const callRef = doc(db, "calls", inputId);
+      callId = inputId;
+
+      const callSnapshot = await getDoc(callRef);
+      const callData = callSnapshot.data();
+
+      const offerDesc = new RTCSessionDescription(callData.offer);
+      await pc.setRemoteDescription(offerDesc);
+
+      const answerDesc = await pc.createAnswer();
+      await pc.setLocalDescription(answerDesc);
+
+      const answer = { type: answerDesc.type, sdp: answerDesc.sdp };
+      await updateDoc(callRef, { answer });
+
+      // Offer ICE dinle
+      onSnapshot(collection(callRef, "offerCandidates"), snapshot => {
+        snapshot.docChanges().forEach(change => {
+          if (change.type === "added") {
+            const candidate = new RTCIceCandidate(change.doc.data());
+            pc.addIceCandidate(candidate);
+          }
+        });
+      });
+    };
+
+    // ❌ Aramayı Bitir
+    document.getElementById("hangupBtn").onclick = () => {
+      pc.close();
+      localStream.getTracks().forEach(track => track.stop());
+      remoteVideo.srcObject = null;
+      localVideo.srcObject = null;
+      alert("Arama sonlandırıldı");
+    };
+  </script>
+</body>
+</html>

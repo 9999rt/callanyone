@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Arkadaşlar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin: 5px;
+    }
+    input {
+      width: 200px;
+    }
+    button {
+      background: #0f0;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #222;
+      margin: 5px;
+      padding: 10px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Arkadaşlarım</h1>
+
+  <div>
+    <input type="text" id="usernameInput" placeholder="Kullanıcı adı gir">
+    <button onclick="addFriend()">Ekle</button>
+  </div>
+
+  <h2>Arkadaş Listesi</h2>
+  <ul id="friendList"></ul>
+
+  <script>
+    // Basit test listesi (Firebase bağlayınca buradan gelecek)
+    let friends = [];
+
+    function addFriend() {
+      const input = document.getElementById("usernameInput");
+      const username = input.value.trim();
+
+      if (username && !friends.includes(username)) {
+        friends.push(username);
+        renderList();
+        input.value = "";
+      } else {
+        alert("Geçerli veya yeni bir kullanıcı adı gir!");
+      }
+    }
+
+    function renderList() {
+      const list = document.getElementById("friendList");
+      list.innerHTML = "";
+      friends.forEach(friend => {
+        const li = document.createElement("li");
+        li.textContent = friend;
+        list.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
+

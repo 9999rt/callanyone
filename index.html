@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firebase Bildirim Testi</title>
+</head>
+<body>
+  <h2>📩 Firebase Bildirim Testi</h2>
+  <button id="izinBtn">🔔 Bildirimlere İzin Ver</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6DIOuHjusyCmyJ6x-HQLmiQc2xuqFNSI",
+      authDomain: "emrbaba-acb73.firebaseapp.com",
+      projectId: "emrbaba-acb73",
+      storageBucket: "emrbaba-acb73.appspot.com",
+      messagingSenderId: "676580712565",
+      appId: "1:676580712565:web:ba34f41a8cb7cfb7e8f88c",
+      measurementId: "G-50X5EMX98Y"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+    const vapidKey = "BHwQCHu4_2NOITnpAUc-NHC9vUJZyAVcq7lJQ-uxb9hY8Ah3ZZVQvIMqHYTnLUFvUq4yF9itjzUfYaCQkz2L3MI";
+
+    // Service worker kaydı (arka plan için şart!)
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/firebase-messaging-sw.js")
+        .then((reg) => console.log("✅ Service Worker kaydedildi:", reg.scope))
+        .catch((err) => console.error("❌ SW hatası:", err));
+    }
+
+    document.getElementById("izinBtn").addEventListener("click", async () => {
+      if (Notification.permission === "granted") {
+        console.log("✅ Bildirim izni zaten verilmiş.");
+        return;
+      }
+
+      if (Notification.permission === "denied") {
+        alert("❌ Bildirimler engellenmiş. Tarayıcı ayarlarından açmalısın.");
+        return;
+      }
+
+      const izin = await Notification.requestPermission();
+      if (izin === "granted") {
+        console.log("🎉 Bildirim izni verildi.");
+        try {
+          const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: await navigator.serviceWorker.ready });
+          console.log("🔥 Tarayıcı Token:", token);
+        } catch (err) {
+          console.error("⚠️ Token alınamadı:", err);
+        }
+      }
+    });
+
+    // Ön planda bildirim yakalama
+    onMessage(messaging, (payload) => {
+      console.log("📩 Ön planda bildirim:", payload);
+      new Notification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: payload.notification.icon,
+      });
+    });
+  </script>
+</body>
+</html>

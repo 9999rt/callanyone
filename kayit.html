@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kayıt Ol</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .register-box {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      width: 350px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input {
+      width: 90%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    button:hover {
+      background: #43a047;
+    }
+    .link {
+      margin-top: 15px;
+      display: block;
+      color: #007bff;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .link:hover {
+      text-decoration: underline;
+    }
+    #status {
+      margin-top: 12px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-box">
+    <h2>Kayıt Ol</h2>
+    <input type="text" id="username" placeholder="Kullanıcı Adı" required>
+    <input type="email" id="email" placeholder="E-posta" required>
+    <input type="password" id="password" placeholder="Şifre" required>
+    <button onclick="register()">Kayıt Ol</button>
+    <a href="giris.html" class="link">Zaten hesabın var mı? Giriş Yap</a>
+    <p id="status"></p>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      updateProfile 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    // 🔥 Firebase ayarların
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6DIOuHjusyCmyJ6x-HQLmiQc2xuqFNSI",
+      authDomain: "emrbaba-acb73.firebaseapp.com",
+      projectId: "emrbaba-acb73",
+      storageBucket: "emrbaba-acb73.firebasestorage.app",
+      messagingSenderId: "240458768537",
+      appId: "1:240458768537:web:d34ea3a69084ec08cb1808",
+      measurementId: "G-1YLMDEVRVK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    async function register() {
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: username });
+
+        document.getElementById("status").innerText = "✅ Kayıt başarılı! Giriş yapabilirsiniz.";
+      } catch (error) {
+        document.getElementById("status").innerText = "❌ " + error.message;
+      }
+    }
+
+    window.register = register;
+  </script>
+</body>
+</html>
