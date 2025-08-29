@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://9999rt.github.io/callanyone/sitemap.xml
