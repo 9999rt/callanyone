@@ -9,6 +9,15 @@
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 🚀 Kullanıcı login kontrol -->
+  <script>
+    // Kullanıcı giriş yapmamışsa login.html'e yönlendir
+    if (!localStorage.getItem("user")) {
+      window.location.href = "login.html";
+    }
+  </script>
+
   <script>
     tailwind.config = {
       theme: {
