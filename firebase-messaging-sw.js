@@ -1,22 +1,21 @@
-importScripts("https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js");
-importScripts("https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js");
+importScripts("https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js");
+importScripts("https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js");
 
 firebase.initializeApp({
-  apiKey: "API_KEY",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID",
+  apiKey: "AIzaSyB6DlOUHjusyCmyJ6x-HQLm1qQc2xuqFNSI",
+  authDomain: "emrbaba-acb73.firebaseapp.com",
+  projectId: "emrbaba-acb73",
+  storageBucket: "emrbaba-acb73.appspot.com",
+  messagingSenderId: "240458768537",
+  appId: "1:240458768537:web:d34ea3a69084ec08cb1808",
+  measurementId: "G-1YLMDERVRK",
 });
 
 const messaging = firebase.messaging();
 
-// Arka planda bildirimleri yakala
 messaging.onBackgroundMessage((payload) => {
-  console.log("📩 Arka planda bildirim geldi:", payload);
   self.registration.showNotification(payload.notification.title, {
     body: payload.notification.body,
-    icon: payload.notification.icon
+    icon: payload.notification.icon,
   });
 });

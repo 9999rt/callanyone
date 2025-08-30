@@ -1,149 +1,41 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giriş Yap</title>
-  <style>
-    /* Arka plan gradient animasyonu */
-    body {
-      margin:0;
-      height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #000000);
-      background-size: 400% 400%;
-      animation: gradientBG 12s ease infinite;
-      color:#fff;
-    }
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Form cam efekti */
-    .login-box {
-      background: rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 40px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 25px rgba(0, 255, 200, 0.4);
-      width: 350px;
-      text-align:center;
-      animation: fadeIn 1.2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity:0; transform: translateY(-20px); }
-      to { opacity:1; transform: translateY(0); }
-    }
-
-    .login-box h2 {
-      margin-bottom:20px;
-      font-size: 28px;
-      font-weight:600;
-      color:#00ffe0;
-      text-shadow: 0 0 10px #00ffe0;
-    }
-
-    input {
-      width:100%;
-      padding:12px;
-      margin:10px 0;
-      border:none;
-      border-radius:8px;
-      background: rgba(255,255,255,0.15);
-      color:#fff;
-      font-size:16px;
-      outline:none;
-    }
-    input::placeholder { color:#ddd; }
-
-    button {
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      border:none;
-      border-radius:8px;
-      background: linear-gradient(90deg, #00ffe0, #00c9a7);
-      color:#000;
-      font-weight:bold;
-      font-size:16px;
-      cursor:pointer;
-      transition:0.3s;
-      box-shadow:0 0 10px #00ffe0;
-    }
-    button:hover {
-      background: linear-gradient(90deg, #00c9a7, #00ffe0);
-      box-shadow:0 0 20px #00ffe0;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/framer-motion/dist/framer-motion.umd.js"></script>
 </head>
-<body>
-  <div class="login-box">
-    <h2>🚀 Hoşgeldin Gardaş</h2>
-    <form id="loginForm">
-      <input type="email" id="email" placeholder="Email" required>
-      <input type="password" id="password" placeholder="Şifre" required>
-      <button type="submit">Giriş Yap</button>
-      <button type="button" onclick="kayitOl()">Kayıt Ol</button>
+<body class="flex items-center justify-center h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-black">
+  <div class="bg-gray-900 p-10 rounded-2xl shadow-2xl w-96 border border-gray-700">
+    <h2 class="text-3xl font-bold text-center text-white mb-6">🔥 Giriş Yap 🔥</h2>
+
+    <form id="loginForm" class="space-y-5">
+      <div>
+        <label class="text-gray-300 block mb-2">Kullanıcı Adı</label>
+        <input type="text" id="username"
+          class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+          placeholder="Kullanıcı adını gir" required />
+      </div>
+
+      <div>
+        <label class="text-gray-300 block mb-2">Şifre</label>
+        <input type="password" id="password"
+          class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+          placeholder="••••••••" required />
+      </div>
+
+      <button type="submit"
+        class="w-full py-3 mt-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold shadow-lg transform hover:scale-105 transition duration-300">
+        🚀 Giriş Yap
+      </button>
     </form>
+
+    <p class="text-gray-400 text-sm text-center mt-6">
+      Hesabın yok mu? <a href="#" class="text-purple-400 hover:text-purple-300">Kayıt ol</a>
+    </p>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyB6DIOuHjusyCmyJ6x-HQLmiQc2xuqFNSI",
-      authDomain: "emrbaba-acb73.firebaseapp.com",
-      projectId: "emrbaba-acb73",
-      storageBucket: "emrbaba-acb73.firebasestorage.app",
-      messagingSenderId: "240458768537",
-      appId: "1:240458768537:web:e3e7faea79ed1af8cb1808",
-      measurementId: "G-6FG6ZTYS6X"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // Giriş yap
-    document.getElementById("loginForm").addEventListener("submit",(e)=>{
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then(()=>{
-          alert("✅ Giriş başarılı!");
-
-          // 🔥 Bildirim izni sadece 1 kere sorulsun
-          if (!localStorage.getItem("notificationPermissionAsked")) {
-            Notification.requestPermission().then(permission => {
-              if (permission === "granted") {
-                console.log("📢 Bildirim izni verildi.");
-              }
-              localStorage.setItem("notificationPermissionAsked", "true");
-            });
-          }
-
-          window.location.href="index.html";
-        })
-        .catch((err)=>{ alert("❌ Hata: " + err.message); });
-    });
-
-    // Kayıt ol
-    window.kayitOl = function(){
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(()=>{ alert("✅ Kayıt başarılı! Artık giriş yapabilirsin."); })
-        .catch((err)=>{ alert("❌ Hata: " + err.message); });
-    }
-  </script>
+  <script src="login.js"></script>
 </body>
 </html>

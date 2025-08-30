@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CallAnyone — emr</title>
+
+  <title>CallAnyone - Ücretsiz Arama ve Sohbet Sitesi</title>
+  <meta name="description" content="CallAnyone ile ücretsiz arama ve sohbet deneyimi yaşa. Neon arayüz, bildirim desteği ve kolay kullanım.">
+
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -127,21 +130,34 @@
       </div>
     </aside>
 
-    <!-- MAIN -->
-    <main class="space-y-10">
+   <!-- MAIN -->
+<main class="space-y-10">
 
-      <!-- HERO -->
-      <section id="hero" class="glass rounded-3xl p-8 md:p-12 shadow-glow border-grad tilt">
-        <div class="tilt-child">
-          <h2 class="text-3xl md:text-5xl font-black leading-tight">Gamer Neon Arayüz — <span class="text-indigo-300">CallAnyone</span></h2>
-          <p class="mt-3 md:text-lg opacity-80 max-w-2xl">Neon glow, cam efekti, ripple, tilt, komut paleti, toast ve özel ses efektleriyle zengin tek sayfa uygulaması. Tüm butonlar işlevli.</p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <button class="btn btn-primary ripple" id="openCmd">⌘ Komut Paleti</button>
-            <button class="btn btn-ghost ripple" id="showToast">🎉 Toast Göster</button>
-            <button class="btn btn-outline ripple" id="demoAction">⚡ Hızlı Aksiyon</button>
-          </div>
-        </div>
-      </section>
+  <!-- Kapak resmi -->
+  <div class="kapak">
+    <img src="images/kapak.png" alt="Site Kapak Resmi" class="w-full h-auto rounded-2xl shadow-lg">
+  </div>
+
+  <!-- HERO -->
+  <section id="hero" class="glass rounded-3xl p-8 md:p-12 shadow-glow border-grad tilt">
+    <div class="tilt-child">
+      <h2 class="text-3xl md:text-5xl font-black leading-tight">
+        Gamer Neon Arayüz — <span class="text-indigo-300">CallAnyone</span>
+      </h2>
+      <p class="mt-3 md:text-lg opacity-80 max-w-2xl">
+        Neon glow, cam efekti, ripple, tilt, komut paleti, toast ve özel ses efektleriyle zengin tek sayfa uygulaması. 
+        Tüm butonlar işlevli.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button class="btn btn-primary ripple" id="openCmd">⌘ Komut Paleti</button>
+        <button class="btn btn-ghost ripple" id="showToast">🎉 Toast Göster</button>
+        <button class="btn btn-outline ripple" id="demoAction">⚡ Hızlı Aksiyon</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
 
       <!-- CONTENT GRID: CHAT + FRIENDS -->
       <section class="grid lg:grid-cols-2 gap-6">
@@ -473,7 +489,7 @@
       if(navigator.share){ try{ await navigator.share({title:'CallAnyone', text:'Efsane gamer UI', url:location.href}); toast('Paylaşıldı 📤','ok'); }catch{} }
       else { await navigator.clipboard.writeText(location.href); toast('Link panoya kopyalandı 📋','ok'); }
     });
-       $('#favBtn').addEventListener('click', ()=>{ play('sSuccess'); toast('Favorilere eklendi ⭐','ok'); });
+    $('#favBtn').addEventListener('click', ()=>{ play('sSuccess'); toast('Favorilere eklendi ⭐','ok'); });
     $('#filesBtn').addEventListener('click', ()=>{ play('sClick'); toast('Dosyalar açıldı 🗂️'); });
 
     // Bildirim izni sadece 1 kez sorulsun
@@ -500,8 +516,33 @@
       }
     }, 5000);
   </script>
+
+  <!-- Senin istediğin ek kısım -->
+  <script>
+  // Bildirim iznini kontrol et
+  if (Notification.permission === "default") {
+    // Daha önce sorulmamışsa sor
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        console.log("Bildirim izni verildi ✅");
+      } else {
+        console.log("Bildirim reddedildi ❌");
+      }
+    });
+  }
+
+  // Bildirim gönderme fonksiyonu
+  function bildirimGonder(title, message) {
+    if (Notification.permission === "granted") {
+      new Notification(title, {
+        body: message,
+        icon: "images/kapak.png" // istersen simge koyabilirsin
+      });
+    }
+  }
+  </script>
+
   <script src="script.js"></script>
 </body>
 </html>
-
 
