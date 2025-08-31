@@ -7,11 +7,15 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Firebase Admin başlat
-const serviceAccount = require("./serviceAccountKey.json");
-
+// Firebase Admin başlat (ENV değişkenlerinden)
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKeyId: process.env.FIREBASE_PRIVATE_KEY_ID,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    clientId: process.env.FIREBASE_CLIENT_ID,
+  }),
 });
 
 // Mesaj gönderme endpoint
@@ -23,12 +27,11 @@ app.post("/send-message", async (req, res) => {
   }
 
   try {
-    // hedef kullanıcının tokenini DB’den çekmen lazım (örnek kodda sabit yazdım)
-    const userToken = to; // normalde DB’den alırsın
+    const userToken = to; // Normalde DB’den alırsın
 
     const payload = {
       notification: {
-        title: `Yeni mesaj - ${from}`,
+        title: `Yeni mesaj - ${from || "Bilinmeyen"}`,
         body: message,
         icon: "/icon.png",
       },
@@ -45,7 +48,7 @@ app.post("/send-message", async (req, res) => {
 });
 
 // Server başlat
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server ${PORT} portunda çalışıyor`);
 });
